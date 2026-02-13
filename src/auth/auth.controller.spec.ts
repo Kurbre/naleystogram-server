@@ -4,7 +4,8 @@ import { AuthService } from './auth.service'
 import { Test, TestingModule } from '@nestjs/testing'
 import { v4 as uuidv4 } from 'uuid'
 import { NotFoundException, UnauthorizedException } from '@nestjs/common'
-import { User } from 'src/users/users.model'
+import { JwtService } from '@nestjs/jwt'
+import { AuthGuard } from './guards/auth.guard'
 
 const user = {
 	_id: uuidv4(),
@@ -33,9 +34,19 @@ describe('AuthController', () => {
 							.fn()
 							.mockResolvedValue({ message: 'Вы вышли из аккаунта.' })
 					}
+				},
+				{
+					provide: JwtService,
+					useValue: {
+						signAsync: jest.fn(),
+						verifyAsync: jest.fn()
+					}
 				}
 			]
-		}).compile()
+		})
+			.overrideGuard(AuthGuard)
+			.useValue({ canActivate: () => true })
+			.compile()
 
 		controller = module.get<AuthController>(AuthController)
 		service = module.get<AuthService>(AuthService)

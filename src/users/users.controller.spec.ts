@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
-import { AuthController } from './auth.controller'
-import { AuthService } from './auth.service'
 import { Test, TestingModule } from '@nestjs/testing'
 import { v4 as uuidv4 } from 'uuid'
 import { NotFoundException, UnauthorizedException } from '@nestjs/common'
-import { User } from 'src/users/users.model'
+import { JwtService } from '@nestjs/jwt'
+import { UsersService } from './users.service'
+import { UsersController } from './users.controller'
+import { AuthGuard } from '../auth/guards/auth.guard'
 
 const user = {
 	_id: uuidv4(),
@@ -16,43 +17,56 @@ const user = {
 	__v: 0
 }
 
-describe('AuthController', () => {
-	let controller: AuthController
-	let service: AuthService
+describe('UsersController', () => {
+	let controller: UsersController
+	let service: UsersService
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			controllers: [AuthController],
+			controllers: [UsersController],
 			providers: [
 				{
-					provide: AuthService,
+					provide: UsersService,
 					useValue: {
-						login: jest.fn().mockResolvedValue(user),
-						register: jest.fn().mockResolvedValue(user),
-						logout: jest
-							.fn()
-							.mockResolvedValue({ message: 'Вы вышли из аккаунта.' })
+						getProfile: jest.fn().mockResolvedValue(user),
+						findById: jest.fn().mockResolvedValue(user),
+						findByIdNoValidation: jest.fn().mockResolvedValue(user)
+					}
+				},
+				{
+					provide: JwtService,
+					useValue: {
+						signAsync: jest.fn(),
+						verifyAsync: jest.fn()
 					}
 				}
 			]
-		}).compile()
+		})
+			.overrideGuard(AuthGuard)
+			.useValue({ canActivate: () => true })
+			.compile()
 
-		controller = module.get<AuthController>(AuthController)
-		service = module.get<AuthService>(AuthService)
+		controller = module.get<UsersController>(UsersController)
+		service = module.get<UsersService>(UsersService)
 	})
 
 	it('should be defined', () => {
 		expect(controller).toBeDefined()
 	})
 
-	it('should login user', async () => {
-		const dto = { email: user.email, password: '123123' }
+	it('should get profile', async () => {
+		const result = await controller.getProfile(user._id)
 
-		const req = { session: {} } as Request
-
-		const result = await controller.login(dto, req)
-
-		expect(service.login).toHaveBeenCalledWith(dto, req)
 		expect(result).toEqual(user)
+	})
+
+	it('should user not found', async () => {
+		jest
+			.spyOn(service, 'findById')
+			.mockRejectedValueOnce(new NotFoundException('Пользователь не найден'))
+
+		await expect(controller.getProfile('non-existent-id')).rejects.toThrow(
+			NotFoundException
+		)
 	})
 })
