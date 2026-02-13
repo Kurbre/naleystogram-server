@@ -47,7 +47,7 @@ export class AuthService {
 	logout(req: Request, res: Response): Promise<{ message: string }> {
 		return new Promise((resolve, reject) => {
 			if (!req.session.token)
-				reject(
+				return reject(
 					new UnauthorizedException(
 						'Вы не авторизованы, чтобы выйти из аккаунта.'
 					)

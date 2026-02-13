@@ -74,4 +74,15 @@ export class UsersService {
 
 		return user
 	}
+
+	async findById(id: string) {
+		const user = await this.userModel.findById(id).exec()
+		if (!user) throw new NotFoundException('Пользователь не найден')
+
+		return user
+	}
+
+	async findByIdNoValidation(id: string) {
+		return await this.userModel.findById(id).exec()
+	}
 }

@@ -15,7 +15,7 @@ async function bootstrap() {
 		collection: 'mySessions'
 	})
 
-	app.setGlobalPrefix('app')
+	app.setGlobalPrefix('api')
 
 	app.useGlobalPipes(
 		new ValidationPipe({
