@@ -19,8 +19,8 @@ export class AuthService {
 		private readonly configService: ConfigService
 	) {}
 
-	async login({ password, ...dto }: LoginDto, req: Request) {
-		const user = await this.usersService.findUserSelectedPassword({ ...dto })
+	async login({ password, login }: LoginDto, req: Request) {
+		const user = await this.usersService.findUserSelectedPassword(login)
 
 		const isValidPassword = await verify(user.password, password)
 
@@ -31,7 +31,7 @@ export class AuthService {
 		const token = await this.generateJwtToken(user.id)
 		await this.saveSession(req, token)
 
-		return await this.usersService.findUser({ ...dto })
+		return await this.usersService.findUser(login)
 	}
 
 	async register(dto: CreateUserDto, req: Request) {

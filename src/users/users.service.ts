@@ -36,17 +36,13 @@ export class UsersService {
 		})
 	}
 
-	async findUserSelectedPassword(searchValue: {
-		email?: string
-		login?: string
-		phoneNumber?: string
-	}) {
+	async findUserSelectedPassword(searchValue: string) {
 		const user = await this.userModel
 			.findOne({
 				$or: [
-					{ email: searchValue.email },
-					{ login: searchValue.login },
-					{ phoneNumber: searchValue.phoneNumber }
+					{ email: searchValue },
+					{ login: searchValue },
+					{ phoneNumber: searchValue }
 				]
 			})
 			.select('password')
@@ -56,17 +52,13 @@ export class UsersService {
 		return user
 	}
 
-	async findUser(searchValue: {
-		email?: string
-		login?: string
-		phoneNumber?: string
-	}) {
+	async findUser(searchValue: string) {
 		const user = await this.userModel
 			.findOne({
 				$or: [
-					{ email: searchValue.email },
-					{ login: searchValue.login },
-					{ phoneNumber: searchValue.phoneNumber }
+					{ email: searchValue },
+					{ login: searchValue },
+					{ phoneNumber: searchValue }
 				]
 			})
 			.exec()
