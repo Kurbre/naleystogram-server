@@ -57,7 +57,7 @@ describe('AuthController', () => {
 	})
 
 	it('should login user', async () => {
-		const dto = { email: user.email, password: '123123' }
+		const dto = { login: user.email, password: '123123' }
 
 		const req = { session: {} } as Request
 
@@ -73,7 +73,7 @@ describe('AuthController', () => {
 			.mockRejectedValueOnce(new NotFoundException('Пользователь не найден'))
 
 		await expect(
-			controller.login({ email: '', password: '' }, { session: {} } as Request)
+			controller.login({ login: '', password: '' }, { session: {} } as Request)
 		).rejects.toThrow(NotFoundException)
 	})
 
