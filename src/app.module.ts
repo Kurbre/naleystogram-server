@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module'
 import { JwtModule } from '@nestjs/jwt'
 import { jwtConfig } from './config/jwt.config'
 import { AuthModule } from './auth/auth.module'
+import { PostsModule } from './posts/posts.module';
 
 @Module({
 	imports: [
@@ -25,7 +26,8 @@ import { AuthModule } from './auth/auth.module'
 			useFactory: jwtConfig
 		}),
 		UsersModule,
-		AuthModule
+		AuthModule,
+		PostsModule
 	],
 	controllers: [],
 	providers: []
